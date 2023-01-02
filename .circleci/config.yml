@@ -43,7 +43,7 @@ jobs:
         - restore_cache: 
             keys: [frontend-build]
         - run: 
-            name: Run frontend test
+            name: Run frontend utest
             command: |
               cd frontend # go to frontend directory
               npm install # install dependencies
@@ -57,9 +57,9 @@ jobs:
     - restore_cache: 
         keys: [backend-build]
     - run: 
-          name: Run frontend test
+          name: Run frontend utest
           command: |
-            cd frontend # go to backend directory
+            cd backend # go to backend directory
             npm install # install dependencies
             npm run test # test-backend   
             npm audit fix
