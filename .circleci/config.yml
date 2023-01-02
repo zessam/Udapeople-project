@@ -1,5 +1,8 @@
 version: 2.1
-            
+
+orbs:
+  slack: circleci/slack@4.12.0
+     
 jobs:
   build-frontend:
     docker:
@@ -100,9 +103,9 @@ jobs:
             npm update minimist --depth 4
             npm update loader-utils --depth 2
             npm audit --audit-level=critical --force
-
-
-      
+    - slack/notify:
+        event: fail
+        template: basic_fail_1
 
 
 
