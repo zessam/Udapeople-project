@@ -57,7 +57,7 @@ jobs:
     - restore_cache: 
         keys: [backend-build]
     - run: 
-          name: Run frontend utest
+          name: Run backend utest
           command: |
             cd backend # go to backend directory
             npm install # install dependencies
