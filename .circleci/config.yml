@@ -116,7 +116,14 @@ jobs:
     - notify_on_failure
     
 
-
+    notify_on_pass:
+      docker: 
+        -image: cimg/base
+      steps: 
+        - slack/notify:
+          event: pass
+          channel: cicd-pipeline
+          template: success_tagged_deployment_1
 
 
 workflows:
@@ -132,3 +139,5 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
+      - notify_on_pass:
+          requires: [build-frontend, build-backend, test-frontend, test-backend, scan-backend, scan-frontend]
