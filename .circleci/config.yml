@@ -146,4 +146,4 @@ workflows:
             - test-frontend 
             - test-backend 
             - scan-backend 
-            - scan-frontend]
+            - scan-frontend
