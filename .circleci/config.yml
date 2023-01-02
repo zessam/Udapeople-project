@@ -140,4 +140,10 @@ workflows:
       - scan-frontend:
           requires: [build-frontend]
       - notify_on_pass:
-          requires: [build-frontend, build-backend, test-frontend, test-backend, scan-backend, scan-frontend]
+          requires: 
+            - build-frontend 
+            - build-backend 
+            - test-frontend 
+            - test-backend 
+            - scan-backend 
+            - scan-frontend]
