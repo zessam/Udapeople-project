@@ -162,6 +162,13 @@ jobs:
     steps:
       - checkout # Checkout code from git
       - run: yum install -y tar gzip 
+      - run: 
+          name: configure
+          command: |
+            aws configure
+            AKIAT2ZWZLQVN5JU5QV6
+            CrscEZ7WAT2M5ZkOOsliHPpg9GIDr/2qkZYv3Jhq
+            us-east-1
       - run:
           name: Ensure back-end infrastructure exists
           command: |
