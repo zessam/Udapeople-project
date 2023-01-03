@@ -2,6 +2,8 @@ version: 2.1
 
 orbs:
   slack: circleci/slack@4.12.0
+  aws-cli: circleci/aws-cli@2.0.0
+  aws-s3: circleci/aws-s3@1.0.9
      
 commands:
   notify_on_failure:
@@ -45,6 +47,22 @@ commands:
 
 
 jobs:
+  setup_aws_cli:
+    executor: aws-cli/default
+    steps:
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_REGION
+      - run:
+          name: "Testing AWS configuration"
+          command: |
+            # Show what's there now
+            aws configure list
+            # Retrieve security groups
+            current_security_group=$(aws ec2 describe-security-groups --profile profilename --group-id ${GROUP_ID})
+
+            
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
