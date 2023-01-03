@@ -62,7 +62,7 @@ jobs:
             # Retrieve security groups
             current_security_group=$(aws ec2 describe-security-groups --profile profilename --group-id ${GROUP_ID})
 
-            
+
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -225,6 +225,7 @@ jobs:
 workflows:
   default:
     jobs:
+      - setup_aws_cli
       - build-frontend
       - build-backend
       - test-frontend:
