@@ -5,6 +5,12 @@ orbs:
   aws-cli: circleci/aws-cli@2.0.0
   aws-s3: circleci/aws-s3@1.0.9
      
+parameters:
+  workflow_id:
+    type: string
+    default: '${CIRCLE_WORKFLOW_ID:0:7}'
+
+
 commands:
   notify_on_failure:
     steps:  
