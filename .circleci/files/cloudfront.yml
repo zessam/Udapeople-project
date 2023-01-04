@@ -3,7 +3,7 @@ Description: >
   ws cloudformation deploy \
          --template-file cloudfront.yml \
          --stack-name InitialStack\
-         --parameter-overrides WorkflowID=d3ycuyfbgr
+         --parameter-overrides WorkflowID=d3ycuyfbgr4
 
 Parameters:
   WorkflowID:
