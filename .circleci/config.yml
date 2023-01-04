@@ -33,7 +33,7 @@ commands:
           command: |
             aws cloudformation delete-stack \
             --stack-name udapeople-backend-<<parameters.workflow_id>>
-            aws s3 rm s3://udapeople-<<parameters.workflow_id>> --recursive
+            aws s3 rm s3://udapeople-d3ycuyfbgr-<<parameters.workflow_id>> --recursive
             aws cloudformation delete-stack \
             --stack-name udapeople-frontend-<<parameters.workflow_id>>
     
@@ -184,10 +184,11 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: amazon/aws-cli # Docker image here that supports AWS CLI
+      - image: cimg/base:stable # Docker image here that supports AWS CLI
     steps:
       - checkout # Checkout code from git
-      - run: yum install -y tar gzip 
+      - install_awscli 
+      #- run: yum install -y tar gzip 
       - run:
           name: Ensure back-end infrastructure exists
           command: |
