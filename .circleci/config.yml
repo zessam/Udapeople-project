@@ -40,7 +40,6 @@ commands:
             # Use n version manager to use Node.js v13.8.0
             sudo npm install --global n
             sudo n 13.8.0
-
     
   destroy-environment: #step for create destroy-environment
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -56,7 +55,6 @@ commands:
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
             aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-
   revert-migrations: #this steps  for create migrations 
     description: Revert the last migration
     parameters:
@@ -76,8 +74,6 @@ commands:
               npm install
               npm run migration:revert
             fi
-
-
 jobs:
   setup_aws_cli: # This job ensure that aws configuration are accurate
     executor: aws-cli/default
@@ -93,8 +89,6 @@ jobs:
             aws configure list
             # Retrieve security groups
             current_security_group=$(aws ec2 describe-security-groups --group-id ${GROUP_ID})
-
-
   build-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -246,29 +240,44 @@ jobs:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
 
-
-  configure-infrastructure:  # create configure-infrastructure
+  configure-infrastructure:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: python:3.7-alpine3.16 # Docker image here that supports Ansible
     steps:
-      - checkout
-      - run: apk add --update tar gzip
+      - checkout # Checkout code from git
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints:
+            - '67:10:c2:58:46:71:0e:03:c7:f6:88:8b:03:72:d7:4e'
+      # attach workspace
       - attach_workspace:
           at: ~/
-      - add_ssh_keys:
-          fingerprints: ["67:10:c2:58:46:71:0e:03:c7:f6:88:8b:03:72:d7:4e"]
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible
+            apk add --update --no-cache tar gzip ansible aws-cli
       - run:
           name: Configure server
           command: |
-            ansible-playbook .circleci/ansible/configure-server.yml -i .circleci/ansible/inventory.txt
+            # add env vars to server
+            echo ENVIRONMENT=production > backend/.env
+            echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> backend/.env
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
+            echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> backend/.env
+            echo TYPEORM_HOST=$TYPEORM_HOST >> backend/.env
+            echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> backend/.env
+            echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> backend/.env
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/.env
+            echo TYPEORM_PORT=$TYPEORM_PORT >> backend/.env
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> backend/.env
+            cat backend/.env
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml  
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/backend
       - destroy-environment
-
-
-
 
   run-migrations: # create run-migrations
     docker:
@@ -353,7 +362,7 @@ jobs:
       - install_ansible
       - install_nodejs
       - add_ssh_keys:
-          fingerprints: ["f8:90:86:da:c9:69:28:c3:ef:61:2a:f5:d8:a5:cc:2e"]
+          fingerprints: ["67:10:c2:58:46:71:0e:03:c7:f6:88:8b:03:72:d7:4e"]
       - attach_workspace:
           at: ~/
       - restore_cache:
@@ -400,7 +409,7 @@ jobs:
           name: Backend smoke test.
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
+            export API_URL="http://${BACKEND_IP}:8000"
             echo "API_URL = ${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
             then
@@ -468,7 +477,3 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-  
-
-
-
