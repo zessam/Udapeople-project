@@ -1,5 +1,9 @@
 Description: >
-  Cloudfront distribution for UdaPeople.
+  Cloudfront distribution for UdaPeople.  Create with 
+  ws cloudformation deploy \
+         --template-file cloudfront.yml \
+         --stack-name InitialStack\
+         --parameter-overrides WorkflowID=d3ycuyfbgr4
 Parameters:
   WorkflowID:
     Description: Unique identifier.
@@ -19,7 +23,7 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !Sub "udapeople-${WorkflowID}.s3.amazonaws.com"
+          - DomainName: !Sub "udapeople-d3ycuyfbgr-${WorkflowID}.s3.amazonaws.com"
             Id: webpage
             S3OriginConfig:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
