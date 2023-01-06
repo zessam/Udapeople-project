@@ -93,7 +93,7 @@ jobs:
             aws configure list
             # Retrieve security groups
             current_security_group=$(aws ec2 describe-security-groups --group-id ${GROUP_ID})
-
+      - notify_on_failure
 
   build-frontend:
     docker:
@@ -488,6 +488,14 @@ jobs:
   #           fi
 
 
+    notify_on_success:
+      docker: 
+       - image: cimg/base
+      steps:
+       - slack/notify:
+          event: pass
+          channel: devops
+          template: success_tagged_deployment_1
 
 
 
@@ -523,7 +531,6 @@ workflows:
       #     requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
-  
-
-
+      - notify_on_success:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
 
