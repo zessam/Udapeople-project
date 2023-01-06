@@ -197,6 +197,21 @@ jobs:
     - notify_on_failure
     
 
+
+  notify_on_success:
+      docker: 
+       - image: cimg/base
+      steps:
+       - slack/notify:
+          event: pass
+          channel: devops
+          template: success_tagged_deployment_1
+
+
+
+
+
+
     # notify_on_pass:
     #   docker: 
     #     -image: cimg/base
@@ -205,6 +220,8 @@ jobs:
     #       event: pass
     #       channel: cicd-pipeline
     #       template: success_tagged_deployment_1
+
+    
 
   # deploy-infrastructure: # create deploy-infrastructure
   #   docker:
@@ -488,14 +505,7 @@ jobs:
   #           fi
 
 
-    notify_on_success:
-      docker: 
-       - image: cimg/base
-      steps:
-       - slack/notify:
-          event: pass
-          channel: devops
-          template: success_tagged_deployment_1
+   
 
 
 
@@ -532,5 +542,9 @@ workflows:
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       - notify_on_success:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+            requires:
+              - test-frontend 
+              - test-backend 
+              - scan-frontend 
+              - scan-backend
 
