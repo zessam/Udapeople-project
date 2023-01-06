@@ -93,7 +93,6 @@ jobs:
             aws configure list
             # Retrieve security groups
             current_security_group=$(aws ec2 describe-security-groups --group-id ${GROUP_ID})
-      - notify_on_failure
 
   build-frontend:
     docker:
@@ -111,7 +110,6 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - notify_on_failure 
   build-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -128,7 +126,6 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - notify_on_failure
   test-frontend:
       docker:
         - image: circleci/node:13.8.0
@@ -142,7 +139,6 @@ jobs:
               cd frontend # go to frontend directory
               npm install # install dependencies
               npm run test # test-frontend       
-        - notify_on_failure
 
   test-backend:
     docker:
@@ -158,7 +154,7 @@ jobs:
             npm install # install dependencies
             npm run test # test-backend   
             npm audit fix
-    - notify_on_failure
+    
 
   scan-frontend:
       docker:
@@ -176,7 +172,7 @@ jobs:
               npm update minimist --depth 4
               npm update loader-utils --depth 2
               npm audit --audit-level=critical --force
-      - notify_on_failure
+      
       
   scan-backend:
     docker:
@@ -194,32 +190,15 @@ jobs:
             npm update minimist --depth 4
             npm update loader-utils --depth 2
             npm audit --audit-level=critical --force
-    - notify_on_failure
     
 
 
-  notify_on_success:
-      docker: 
-       - image:  circleci/node:13.8.0
-      steps:
-       - slack/notify:
-          event: pass
-          channel: devops
-          template: success_tagged_deployment_1
+ 
 
 
 
 
 
-
-    # notify_on_pass:
-    #   docker: 
-    #     -image: cimg/base
-    #   steps: 
-    #     - slack/notify:
-    #       event: pass
-    #       channel: cicd-pipeline
-    #       template: success_tagged_deployment_1
 
     
 
