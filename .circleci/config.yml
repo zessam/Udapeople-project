@@ -432,6 +432,7 @@ workflows:
             branches:
               only: [main-prod]
 
+
      # - add-prometheus-node-exporter:
       #    requires: [deploy-infrastructure]
       - configure-infrastructure:
