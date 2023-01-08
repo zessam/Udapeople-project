@@ -164,8 +164,9 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - destroy-environment:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3.16
@@ -201,8 +202,8 @@ jobs:
           root: ~/
           paths:
             - project/backend
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - destroy-environment:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   run-migrations:
     docker:
       - image: circleci/node:13.8.0 # safest to use to avoid migration errors
@@ -231,8 +232,8 @@ jobs:
             then
               curl --insecure https://kvdb.io/5irz6ECHWkuuNtj6Q7Wuzp/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
             fi
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - destroy-environment:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   deploy-frontend:
     docker:
       - image: python:3.7-alpine3.16
@@ -263,10 +264,10 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - destroy-environment:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - revert-migrations:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   deploy-backend:
     docker:
       - image: python:3.7-alpine3.16
@@ -296,42 +297,45 @@ jobs:
             cd .circleci/ansible
             echo "Contents of the inventory.txt file is ------$(cat inventory.txt)"
             ansible-playbook -i inventory.txt deploy-backend.yml
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-  smoke-test:
+      # # - destroy-environment:
+      # #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # # - revert-migrations:
+      # #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  smoke-test: # createe smoke-test
     docker:
-      - image: python:3.7-alpine3.16
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run:
-          name: Install dependencies
+          name: "Install curl"
           command: |
-            apk add --update --no-cache curl aws-cli nodejs npm
-      # - attach_workspace:
-      #     at: ~/
+            yum install -y curl
+           
       - run:
-          name: Backend smoke test
+          name: Backend smoke test.
           command: |
-            # export BACKEND_IP=$(tail ~/project/.circleci/ansible/inventory.txt)
-            export BACKEND_IP=$(aws ec2 describe-instances \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-            --output text)
+            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo $API_URL
-            if curl --connect-timeout 5 "${API_URL}/api/status" | grep "ok"; then return 0; else return 0; fi
+            echo "API_URL = ${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+                exit 0
+            else
+                exit 1
+            fi
       - run:
           name: Frontend smoke test.
           command: |
-            export URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees"            
-            echo $URL
-            if curl ${URL} | grep "Welcome"; then return 0; else return 1; fi
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"            
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              exit 0
+            else
+              exit 1
+            fi 
+      # - destroy-environment 
+      # - revert-migrations
   
   cloudfront-update:
     docker:
@@ -356,10 +360,10 @@ jobs:
             --stack-name InitialStack \
             --parameter-overrides WorkflowID=${CIRCLE_WORKFLOW_ID:0:7} \
             --tags project=udapeople
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - destroy-environment:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      # - revert-migrations:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   
   
   
@@ -445,5 +449,5 @@ workflows:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      #- cleanup:
+      #    requires: [cloudfront-update]
