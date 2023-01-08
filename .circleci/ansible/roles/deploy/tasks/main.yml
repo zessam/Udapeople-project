@@ -23,19 +23,19 @@
     state: latest
     production: yes
 
-- name: "move files to server"
-  become: yes
-  synchronize:
-  src: /root/project/backend/dist
-  dest: ./udapeople-circle
-  recursive: true
+# - name: "move files to server"
+#   become: yes
+#   synchronize:
+#   src: /root/project/backend/dist
+#   dest: ./udapeople-circle
+#   recursive: true
 
 
 
 - name: extract artifact
   become: yes
   unarchive:
-    src: files/artifact.tar.gz
+    src: artifact.tar.gz
     dest: .
 
 
