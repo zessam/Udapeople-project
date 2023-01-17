@@ -626,7 +626,7 @@ jobs:
             npm i
             npm audit fix --audit-level=critical --force
 
-  deploy-infra:
+  deploy-infrastructure:
     docker:
       - image: amazon/aws-cli:latest
     steps:
@@ -650,7 +650,7 @@ jobs:
             --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} \
 
-  config-infra:
+  configure-infrastructure:
     docker:
       - image: cimg/python:3.8
     steps:
@@ -883,55 +883,34 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend:
-          filters:
-            branches:
-              only: master
-      - build-backend:
-          filters:
-            branches:
-              only: master
+      - build-frontend
+      - build-backend
       - test-frontend:
-          requires:
-            - build-frontend
+          requires: [build-frontend]
       - test-backend:
-          requires:
-            - build-backend
-      - scan-frontend:
-          requires:
-            - build-frontend
+          requires: [build-backend]
       - scan-backend:
-          requires:
-            - build-backend
-      - deploy-infra:
-          requires:
-            - test-frontend
-            - test-backend
-            - scan-frontend
-            - scan-backend
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: master
-      - config-infra:
-          requires:
-            - deploy-infra
-      - run-migration:
-          requires:
-            - config-infra
-      - deploy-backend:
-          requires:
-            - run-migration
+              only: [main-prod]
+     # - add-prometheus-node-exporter:
+      #    requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]
       - deploy-frontend:
-          requires:
-            - run-migration
-            - deploy-backend
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       - smoke-test:
-          requires:
-            - deploy-frontend
-            - deploy-backend
+          requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
-          requires:
-            - smoke-test
-      - cleanup-phase:
-          requires:
-            - cloudfront-update
+          requires: [smoke-test]
+      # - cleanup:
+      #     requires: [cloudfront-update]
