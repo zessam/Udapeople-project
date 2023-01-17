@@ -1,54 +1,54 @@
-# ---
-# - name: 'update and upgrade packages.' # sudo apt upgrade
-#   become: yes
-#   apt:
-#     upgrade: yes
-#     update_cache: yes
-#     cache_valid_time: 86400
-# - name: remove unneeded deps # sudo apt autoremove
-#   become: yes
-#   apt:
-#     autoremove: yes
-# - name: install deps # sudo apt install nodejs npm
-#   become: yes
-#   apt:
-#     name: ['nodejs', 'npm']
-#     state: latest
-#     update_cache: yes
+---
+- name: 'update and upgrade packages.' # sudo apt upgrade
+  become: yes
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400
+- name: remove unneeded deps # sudo apt autoremove
+  become: yes
+  apt:
+    autoremove: yes
+- name: install deps # sudo apt install nodejs npm
+  become: yes
+  apt:
+    name: ['nodejs', 'npm']
+    state: latest
+    update_cache: yes
 
-# - name: "install n"
-#   become: yes
-#   npm:
-#     name: n
-#     global: yes
-#     production: yes
+- name: "install n"
+  become: yes
+  npm:
+    name: n
+    global: yes
+    production: yes
 
-# - name: "install nodejs 13.8.0"
-#   become: yes
-#   shell: n 13.8.0
-
-
-
-# - name: install pm2 # sudo npm install pm2 -g
-#   become: yes
-#   npm:
-#     name: pm2
-#     global: yes
-#     state: latest
-#     production: yes
+- name: "install nodejs 13.8.0"
+  become: yes
+  shell: n 13.8.0
 
 
-- name: upgrade and  update packages
-  apt: 
-   update_cache: yes
 
-- name: Install nodejs
-  become: true
-  shell: |
-    curl -fsSl https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-    sudo npm install --global n
-    sudo n 13.8.0
+- name: install pm2 # sudo npm install pm2 -g
+  become: yes
+  npm:
+    name: pm2
+    global: yes
+    state: latest
+    production: yes
 
-- name: install pm2
-  command: npm install pm2 -g
+
+# - name: upgrade and  update packages
+#   apt: 
+#    update_cache: yes
+
+# - name: Install nodejs
+#   become: true
+#   shell: |
+#     curl -fsSl https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+#     sudo apt-get install -y nodejs
+#     sudo npm install --global n
+#     sudo n 13.8.0
+
+# - name: install pm2
+#   command: npm install pm2 -g
