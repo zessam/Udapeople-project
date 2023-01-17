@@ -1,7 +1,6 @@
 https://github.com/zezo-rgb/Udapeople-project
 
-http://udapeople-d8d02cb.s3-website-us-east-1.amazonaws.com/#/employees
-
+http://udapeople-59ecfe9.s3-website-us-east-1.amazonaws.com/#/employees
 
 dhf4q6toela3n.cloudfront.net	
 
