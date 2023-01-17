@@ -36,19 +36,3 @@
     global: yes
     state: latest
     production: yes
-
-
-# - name: upgrade and  update packages
-#   apt: 
-#    update_cache: yes
-
-# - name: Install nodejs
-#   become: true
-#   shell: |
-#     curl -fsSl https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-#     sudo apt-get install -y nodejs
-#     sudo npm install --global n
-#     sudo n 13.8.0
-
-# - name: install pm2
-#   command: npm install pm2 -g
